@@ -104,3 +104,139 @@ src/
   App.jsx                   # Routes and layout
   main.jsx                  # React entry point
   index.css                 # Tailwind setup + base styles
+```
+
+## 🧩 Implementation Details (Method Used)
+
+### 1. API Integration
+All API requests are abstracted into **`src/api/openFoodFacts.js`**:
+
+| Function | Purpose |
+|--------|----------|
+| `getProductsByCategory({ category, page, pageSize })` | Fetch products by category using `/category/{category}.json` |
+| `searchProductsByName({ query, category, page, pageSize })` | Uses `/cgi/search.pl` with search_terms & optional category |
+| `getProductByBarcode(barcode)` | Retrieves single product using `/api/v0/product/{barcode}.json` |
+| `fetchCategories()` | Loads all categories using `/categories.json` |
+
+This separation keeps **API logic clean, reusable, and independent of UI components.**
+
+---
+
+### 2. Homepage Logic (`Home.jsx`)
+The home page manages:
+
+- Products list
+- Search inputs (`nameInput`, `nameQuery`)
+- Barcode search
+- Category selection
+- Sort type & order
+- Pagination (Load More)
+- Loading/Error state indicators
+
+Updates are triggered via `useEffect()` whenever:
+
+- category changes  
+- search query updates  
+- sorting changes  
+- page number increments  
+
+#### Load More Pagination
+- If `page === 1` → product list resets  
+- Else → new products are **appended** (infinite-like behavior)
+
+#### Sorting Logic
+- **Name** → alphabetical A–Z / Z–A  
+- **Nutrition grade** → sorted based on grade value
+
+---
+
+### 3. Cart & State Management (Bonus)
+Implemented using **React Context API** (`CartContext.jsx`):
+
+| Functionality | Description |
+|---|---|
+| `items` | Stores products in cart |
+| `addToCart(product)` | Adds item or increments quantity |
+| `removeFromCart(code)` | Removes item from cart |
+| `clearCart()` | Clears entire cart |
+| `totalItems` | Shows total count of products in cart |
+
+- `CartProvider` wraps the app in `App.jsx`.
+- `Header.jsx` displays **Cart count** globally.
+- `ProductDetail.jsx` provides **Add/Remove** cart button based on item status.
+
+This demonstrates **global shared state without Redux**.
+
+---
+
+### 4. Error Handling & Loading States
+
+- Shows **Loading products...** while fetching
+- Displays error messages like:  
+  **`Failed to load products. Please try again.`**
+- Barcode search:
+  - If product not found → **`Product not found.`**
+
+Helps handle situations when external API is slow/unresponsive.
+
+---
+
+### 5. Responsive Design
+
+Tailwind CSS breakpoints provide mobile-first layout:
+
+| Feature | Classes Used |
+|---|---|
+| Product Grid | `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3` |
+| Layout responsiveness | `flex-col md:flex-row` |
+| Spacing & structure | `container mx-auto px-4` |
+
+Works smoothly on **mobile, tablet & desktop screens.**
+
+---
+
+## ▶️ Run Locally
+
+```bash
+git clone https://github.com/<username>/<repo-name>.git
+cd <repo-name>
+npm install
+npm run dev
+```
+
+
+Open the URL shown in the terminal (usually **http://localhost:5173**)
+
+---
+
+## ⏱ Time Taken
+
+| Task | Time Spent |
+|---|---|
+| Planning & reading assignment | **1 hour** |
+| Project setup (Vite, Tailwind, routing) | **1 hour** |
+| API integration & basic listing | **2 hours** |
+| Search, filters, sorting, load more | **2 hours** |
+| Product detail page UI + fetch logic | **2 hours** |
+| Cart + Context (bonus feature) | **2 hours** |
+| UI polish, responsiveness & testing | **1 hour** |
+| **Total development time** | **11 hours approx** |
+
+
+
+
+---
+
+## 🚧 Known Limitations / Possible Improvements
+
+- Relies on OpenFoodFacts API, so response time may vary.
+- Infinite scroll can replace "Load More" for smoother UX.
+- More filters (vegan, gluten-free, labels) can be added.
+- Optional cart page/checkout UI could be implemented.
+
+---
+
+## 📄 Note
+
+This application is built only for evaluation & learning purposes.  
+
